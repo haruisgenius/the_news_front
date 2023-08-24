@@ -1,26 +1,69 @@
 <script>
+export default {
+  data() {
+    return {
+      news: []
+    }
+  },
+  mounted() {
+    this.findNews()
+  },
+  methods: {
+    goBack() {
+      this.$router.go(-1)
+    },
+    findNews() {
+      // 拿網址內的消息代號
+      let serialNumber = this.$route.params.serialNumber
+      console.log(serialNumber)
+      let body = {
+        serialNumber : serialNumber
+      }
+      fetch("http://localhost:8080/find_news", {
+        method: "POST",
+        headers: {
+          "Content-Type" : "application/json"
+        },
+        body : JSON.stringify(body)
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log(data.news)
+          this.news = data.news
+        })
+    }
+  },
+  watch: {
+    
+  },
+  computed: {
+    
+  }
+}
 </script>
 
 <template>
   <div class="news-content">
     <div class="back-to-news">
-      <a href="/">回到最新消息</a>
+      <div @click="goBack()" class="go-back">回到最新消息</div>
     </div>
+
     <div class="news">
 
       <div class="news-detail">
-        <p class="title">Title</p>
-        <p class="date">2023/08/12</p>
+        <p class="title">{{ this.news.title }}</p>
+        <p class="date">{{ this.news.updateDate }}</p>
       </div>
       <div class="content">
-        <p>content</p>
+        <p>{{ this.news.content }}</p>
       </div>
     </div>
+
   </div>
 </template>
 
 <style lang="scss" scoped>
-a {
+.go-back {
   text-decoration-line: none;
   color: #535353;
 
@@ -28,11 +71,11 @@ a {
 
   &:hover {
     cursor: pointer;
-    scale: 1.05;
+    scale: 1.005;
   }
 
   &:active {
-    scale: 0.95;
+    scale: 0.99;
   }
 }
 
@@ -56,7 +99,8 @@ a {
   }
   
   .content {
-    margin: 1rem 0;
+    margin-top: 2rem;
+    padding-bottom: 12rem;
   
     p{
       margin: 0;

@@ -10,22 +10,23 @@ export default {
       type: Array,
       required: true
     },
+    today: Date,   // 今天日期
     isUpdateNews: false,   // 是否顯示編輯消息
     isCreateNews: false,   // 是否顯示新增消息
     isUnupdateNews: false,   // 是否顯示尚未發布消息
   },
-  deta() {
+  data() {
     return {
 
     }
-  }
+  },
 }
 </script>
 
 <template>
   <div>
     <div class="create-btn list-group" v-if="isCreateNews">
-      <RouterLink :to="`/create-news/${ serialNumber }`" class="create-news list-group-item list-group-item-action">
+      <RouterLink :to="`/create-news/`" class="create-news list-group-item list-group-item-action">
         新增
       </RouterLink>
 
@@ -33,29 +34,39 @@ export default {
     <div class="list-group">
 
       <!-- one news -->
-      <RouterLink :to="`/create-news/${ serialNumber }`" class="one-news list-group-item list-group-item-action">
-        <div class="text-area">
-          <div class="update-time-p">2023/08/23</div>
-          <div class="title-p">Title</div>
-        </div>
+      <div class="a-news-area" v-for=" news in newsData">
+        <!-- updated news -->
+        <RouterLink :to="`/news-content/${news.serialNumber}`" v-if="news.updateDate < today"
+          class="one-news list-group-item list-group-item-action" :key="news.serialNumber">
+          <div class="text-area">
+            <div class="time d-flex">
+              <div class="update-time-p">{{ news.updateDate.toISOString().split('T')[0] }}</div>
+              <div class="tags">{{ news.tags }}</div>
+            </div>
+            <div class="title-p">{{ news.title }}</div>
+          </div>
+        </RouterLink>
 
-        <!-- <div class="update-btn-area">
-          <div class="update-btn">編輯</div>
-        </div> -->
-      </RouterLink>
+        <!-- unupdate news -->
+        <RouterLink :to="`/create-news/${news.serialNumber}`" v-if="isUnupdateNews && news.updateDate > today"
+          class="one-news list-group-item list-group-item-action">
+          <div class="text-area">
+
+            <div class="time d-flex">
+              <div class="update-time-p">{{ news.updateDate.toISOString().split('T')[0] }}</div>
+              <div class="unupdate-tags">{{ news.tags }}</div>
+            </div>
+
+            <div class="title-p unupdate-news">{{ news.title }}</div>
+          </div>
+
+          <div class="update-btn-area">
+            <div class="update-btn">可編輯</div>
+          </div>
+        </RouterLink>
 
 
-      <!-- unupdate news -->
-      <RouterLink :to="`/create-news/${ serialNumber }`" class="one-news list-group-item list-group-item-action" v-if="isUnupdateNews">
-        <div class="text-area">
-          <div class="update-time-p unupdate-news">2023/11/01</div>
-          <div class="title-p unupdate-news">Title</div>
-        </div>
-
-        <div class="update-btn-area">
-          <div class="update-btn">編輯</div>
-        </div>
-      </RouterLink>
+      </div>
 
     </div>
   </div>
@@ -88,10 +99,27 @@ export default {
       width: 85%;
 
       .update-time-p {
-        width: 100%;
         font-size: 1rem;
       }
-  
+
+      .tags {
+        margin-left: 0.5rem;
+        padding: 0 0.35rem;
+        background-color: #92B0FF;
+        border: 0.1rem solid #5873B9;
+        border-radius: 2rem;
+        text-align: center;
+      }
+
+      .unupdate-tags {
+        margin-left: 0.5rem;
+        padding: 0 0.35rem;
+        background-color: #c1d1f9;
+        border: 0.1rem solid #7786ae;
+        border-radius: 2rem;
+        text-align: center;
+      }
+
       .title-p {
         width: 100%;
         font-size: 1.5rem;

@@ -1,21 +1,32 @@
 <script>
-import Modal from './Modal.vue'
-
 export default {
-  components: {
-    Modal,
+  props: {
+    tagsData: { // 為表格內容，必需為陣列形式
+      type: Array,
+      required: true
+    },
   },
+  data() {
+    return {
+
+    }
+  },
+  methods: {
+    console() {
+      console.log("tagsData")
+    }
+  },
+  mounted() {
+    this.console();
+  }
 }
 </script>
 
 <template>
   <div class="tag-group">
-    <div class="tag btn">
-      DVD
-    </div>
-    <div class="tag btn">
-      CD
-    </div>
+    <!-- <input type="button" value=""> -->
+    <input type="button" class="tag btn" :data-value="tag.tags" v-for="tag in tagsData" :key="tag.tagsNumber">
+      {{ tag.tags }}
     <!-- <div class="tag btn modify-tag">編輯標籤</div> -->
   </div>
 </template>

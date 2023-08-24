@@ -1,20 +1,56 @@
 <script>
-import TagList from '../components/TagList.vue'
 import Modal from '../components/Modal.vue'
 
 export default {
   components: {
-    TagList,
     Modal,
   },
   data() {
     return {
-      isModalShow: false
+      isModalShow: false,
+      title: '',    // 標題
+      updateDate: (new Date()).getTime(),    // 發布日期
+      tags: '',    // 標籤
+      content: '',    // 內容
+
+      isReadOnly: false,  // 答案唯讀
+      createAnsBtnShow: false,  // 顯示提交答案按鈕
+      inputReadOnlyShow: true,  // 顯示檢查答案按鈕
+      updateAnsBtn: false,  // 顯示返回修改答案按鈕
     }
+  },
+  mounted() {
+    this.isFindNews();
   },
   methods: {
     switchModal() {
       this.isModalShow = !this.isModalShow
+    },
+    goBack() {
+      this.$router.go(-1)
+    },
+    isFindNews() {
+      let serialNumber = this.$route.params.serialNumber
+      // console.log(serialNumber)
+      if (serialNumber) {
+        let body = {
+          serialNumber: serialNumber
+        }
+        console.log(body)
+        fetch("http://localhost:8080/find_news", {
+          method: "POST",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify(body)
+        })
+          .then(res => res.json())
+          .then(data => {
+            console.log(data)
+          })
+      } else {
+        console.log("沒有news")
+      }
     }
   }
 }
@@ -24,7 +60,7 @@ export default {
   <div class="create-news">
 
     <div class="back-to-news">
-      <a href="/manager-home">返回</a>
+      <div @click="goBack()" class="go-back">返回</div>
     </div>
 
     <div class="create">
@@ -44,15 +80,13 @@ export default {
         <div class="tag-input d-flex">
           <label for="content">標籤</label>
           <div class="choose-tag">
-            <TagList />
+
           </div>
           <!-- 編輯 -->
 
         </div>
         <div class="tag-list d-flex">
-          <TagList />
           <div class="modify-tag">
-
             <div class="btn modify-btn" @click="switchModal">編輯標籤</div>
           </div>
         </div>
@@ -60,7 +94,11 @@ export default {
 
       <div class="four-area one-area">
         <label for="content">內容</label>
-        <textarea class="content-input" name="" id="content" cols="5" rows="20"></textarea>
+        <div class="input-and-error">
+          <label for="content" class="error-text">內容不可為空</label>
+          <textarea class="content-input" name="" id="content" cols="5" rows="20"></textarea>
+
+        </div>
       </div>
     </div>
 
@@ -89,21 +127,21 @@ export default {
             <label for="dvd">DVD</label>
           </div>
         </div>
-  
+
         <div class="old-tags">
           <div class="one-tag">
             <input type="checkbox" name="" id="dvd">
             <label for="dvd">DVD</label>
           </div>
         </div>
-  
+
         <div class="old-tags">
           <div class="one-tag">
             <input type="checkbox" name="" id="dvd">
             <label for="dvd">DVD</label>
           </div>
         </div>
-  
+
         <div class="old-tags">
           <div class="one-tag">
             <input type="checkbox" name="" id="dvd">
@@ -128,7 +166,7 @@ export default {
 </template>
 
 <style lang="scss" scoped>
-a {
+.go-back {
   text-decoration-line: none;
   color: #535353;
 
@@ -136,11 +174,11 @@ a {
 
   &:hover {
     cursor: pointer;
-    scale: 1.05;
+    scale: 1.005;
   }
 
   &:active {
-    scale: 0.95;
+    scale: 0.99;
   }
 }
 
@@ -172,7 +210,9 @@ a {
       margin-left: 2rem;
     }
 
-    .content-input {
+    .input-and-error {
+      display: flex;
+      flex-direction: column;
       width: 85%;
       margin-left: 4rem;
     }

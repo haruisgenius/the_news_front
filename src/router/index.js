@@ -20,7 +20,7 @@ const router = createRouter({
       component: () => import('../views/ManagerHome.vue')
     },
     {
-      path: '/create-news',
+      path: '/create-news/:serialNumber?',
       name: 'CreateNews',
       component: () => import('../views/CreateNews.vue')
     }

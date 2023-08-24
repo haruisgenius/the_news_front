@@ -4,7 +4,7 @@
 <template>
   <header>
     <a href="/">User</a>
-    <a href="/news-content">NewsContent</a>
+    <!-- <a href="/news-content">NewsContent</a> -->
     <a href="/manager-home">Manager</a>
   </header>
 </template>
