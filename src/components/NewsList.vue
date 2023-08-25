@@ -48,7 +48,7 @@ export default {
         </RouterLink>
 
         <!-- unupdate news -->
-        <RouterLink :to="`/create-news/${news.serialNumber}`" v-if="isUnupdateNews && news.updateDate > today"
+        <RouterLink :to="`/update-news/${news.serialNumber}`" v-if="isUnupdateNews && news.updateDate > today"
           class="one-news list-group-item list-group-item-action">
           <div class="text-area">
 

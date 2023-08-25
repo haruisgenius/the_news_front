@@ -45,7 +45,7 @@ export default {
 <template>
   <div class="news-content">
     <div class="back-to-news">
-      <div @click="goBack()" class="go-back">回到最新消息</div>
+      <div @click="goBack()" class="go-back"><i class="fa-solid fa-angle-left me-1"></i>回到最新消息</div>
     </div>
 
     <div class="news">

@@ -33,8 +33,7 @@ export default {
     }
   },
   mounted() {
-    this.isFindNews();
-    this.getToday()
+    this.isFindNews()
   },
   methods: {
     switchModal() {
@@ -69,19 +68,9 @@ export default {
       } else { this.contentError = '' }
 
       // 若防呆都通過
-      if(!this.titleError && !this.dateError && !this.tagsError && !this.contentError) {
+      if (!this.titleError && !this.dateError && !this.tagsError && !this.contentError) {
         this.isUpdateAllow = false
         this.updateNewsBtnShow = true
-
-        let news = {
-          'title': this.title,
-          'updateDate': this.updateDate,
-          'tags': this.tags,
-          'content': this.content
-        }
-
-        sessionStorage.setItem('news', JSON.stringify(news))
-        console.log(sessionStorage.getItem('news'))
       }
 
     },
@@ -94,39 +83,28 @@ export default {
     goBack() {
       this.$router.go(-1)
     },
-    getToday() {
-      let ddd = new Date();
-      let day = ("0" + ddd.getDate()).slice(-2)
-      let month = ("0" + (ddd.getMonth() + 1)).slice(-2)
-      let today = ddd.getFullYear() + "-" + (month) + "-" + (day)
-      console.log(today)
-      this.updateDate = today
-    },
     isFindNews() {
-    //   let serialNumber = this.$route.params.serialNumber
-    //   // console.log(serialNumber)
-    //   if (serialNumber) {
-    //     let body = {
-    //       serialNumber: serialNumber
-    //     }
-    //     console.log(body)
-    //     fetch("http://localhost:8080/find_news", {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-type": "application/json"
-    //       },
-    //       body: JSON.stringify(body)
-    //     })
-    //       .then(res => res.json())
-    //       .then(data => {
-    //         console.log(data.news)
-    //         this.newsData = data.news
-    //         this.title = this.newsData.title
-    //         this.updateDate = this.newsData.updateDate
-    //         this.tags = this.newsData.tags
-    //         this.content = this.newsData.content
-    //       })
-    //   }
+      let serialNumber = this.$route.params.serialNumber
+      let body = {
+        serialNumber: serialNumber
+      }
+      console.log(body)
+      fetch("http://localhost:8080/find_news", {
+        method: "POST",
+        headers: {
+          "Content-type": "application/json"
+        },
+        body: JSON.stringify(body)
+      })
+        .then(res => res.json())
+        .then(data => {
+          console.log(data.news)
+          this.newsData = data.news
+          this.title = this.newsData.title
+          this.updateDate = this.newsData.updateDate
+          this.tags = this.newsData.tags
+          this.content = this.newsData.content
+        })
 
       // find tags
       fetch("http://localhost:8080/find_all_tags")
@@ -136,32 +114,29 @@ export default {
           this.tagsData = data.tagsList
           console.log(this.tagsData)
         })
-
-      // 判斷session storage內是否有尚未發布的news
-      let sessionNews = sessionStorage.getItem('news')
-      if (sessionNews) {
-        sessionNews = JSON.parse(sessionNews)
-        console.log(sessionNews)
-        this.title = sessionNews.title
-        this.updateDate = sessionNews.updateDate
-        this.tags = sessionNews.tags
-        this.content = sessionNews.content
-      }
     },
     updateNews() {
-      let body = JSON.parse(sessionStorage.getItem('news'))
-
-      fetch("http://localhost:8080/create_news", {
+      let serialNumber = this.$route.params.serialNumber
+      let body = {
+        'serialNumber': serialNumber,
+        'title': this.title,
+        'updateDate': this.updateDate,
+        'tags': this.tags,
+        'content': this.content
+      }
+      fetch("http://localhost:8080/update_news", {
         method: "POST",
         headers: {
-          "Content-type" : "application/json"
+          "Content-type": "application/json"
         },
         body: JSON.stringify(body)
       })
         .then(res => res.json())
         .then(data => {
-          console.log(data)
-          this.isMessageModalShow = true
+          console.log(data.message)
+          if(data.message) {
+            this.isMessageModalShow = !this.isMessageModalShow
+          }
         })
     },
     SwitchWindow() {
@@ -404,19 +379,6 @@ export default {
         }
       }
     }
-
-    // .modify-tag {
-    //   margin-left: 0.5rem;
-    //   display: flex;
-    //   align-items: center;
-    //   justify-content: center;
-
-    // }
-
-
-    // .tag-list {
-    //   margin-left: 6rem;
-    // }
   }
 
 }
@@ -558,5 +520,4 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 </style>
