@@ -11,18 +11,20 @@ export default {
     return {
       newsData: [],         // 消息內容
       tagsData: [],         // 標籤內容
+      deleteTagsList: [],         // 刪除標籤list
       isModalShow: false,   // 是否顯示彈跳視窗
       isMessageModalShow: false,   // 是否顯示訊息彈跳視窗
       title: '',            // 標題
       updateDate: '',       // 發布日期
       tags: '',             // 標籤
       content: '',          // 內容
+      createTagsInput: '',   // 新增標籤輸入框
 
       // 錯誤訊息
       titleError: '',          // 標題
-      dateError: '',  // 時間錯誤
-      tagsError: '',       // 標籤分類錯誤
-      contentError: '',       // 內容錯誤
+      dateError: '',           // 時間錯誤
+      tagsError: '',           // 標籤分類錯誤
+      contentError: '',        // 內容錯誤
 
       // 檢查輸入內容
       isReadOnly: false,         // input是否唯讀
@@ -33,7 +35,7 @@ export default {
     }
   },
   mounted() {
-    this.isFindNews();
+    this.findTags();
     this.getToday()
   },
   methods: {
@@ -69,7 +71,7 @@ export default {
       } else { this.contentError = '' }
 
       // 若防呆都通過
-      if(!this.titleError && !this.dateError && !this.tagsError && !this.contentError) {
+      if (!this.titleError && !this.dateError && !this.tagsError && !this.contentError) {
         this.isUpdateAllow = false
         this.updateNewsBtnShow = true
 
@@ -102,31 +104,31 @@ export default {
       console.log(today)
       this.updateDate = today
     },
-    isFindNews() {
-    //   let serialNumber = this.$route.params.serialNumber
-    //   // console.log(serialNumber)
-    //   if (serialNumber) {
-    //     let body = {
-    //       serialNumber: serialNumber
-    //     }
-    //     console.log(body)
-    //     fetch("http://localhost:8080/find_news", {
-    //       method: "POST",
-    //       headers: {
-    //         "Content-type": "application/json"
-    //       },
-    //       body: JSON.stringify(body)
-    //     })
-    //       .then(res => res.json())
-    //       .then(data => {
-    //         console.log(data.news)
-    //         this.newsData = data.news
-    //         this.title = this.newsData.title
-    //         this.updateDate = this.newsData.updateDate
-    //         this.tags = this.newsData.tags
-    //         this.content = this.newsData.content
-    //       })
-    //   }
+    findTags() {
+      //   let serialNumber = this.$route.params.serialNumber
+      //   // console.log(serialNumber)
+      //   if (serialNumber) {
+      //     let body = {
+      //       serialNumber: serialNumber
+      //     }
+      //     console.log(body)
+      //     fetch("http://localhost:8080/find_news", {
+      //       method: "POST",
+      //       headers: {
+      //         "Content-type": "application/json"
+      //       },
+      //       body: JSON.stringify(body)
+      //     })
+      //       .then(res => res.json())
+      //       .then(data => {
+      //         console.log(data.news)
+      //         this.newsData = data.news
+      //         this.title = this.newsData.title
+      //         this.updateDate = this.newsData.updateDate
+      //         this.tags = this.newsData.tags
+      //         this.content = this.newsData.content
+      //       })
+      //   }
 
       // find tags
       fetch("http://localhost:8080/find_all_tags")
@@ -154,7 +156,7 @@ export default {
       fetch("http://localhost:8080/create_news", {
         method: "POST",
         headers: {
-          "Content-type" : "application/json"
+          "Content-type": "application/json"
         },
         body: JSON.stringify(body)
       })
@@ -163,10 +165,55 @@ export default {
           console.log(data)
           this.isMessageModalShow = true
         })
+      sessionStorage.removeItem('news')
+      window.location.href = '/manager-home'
     },
     SwitchWindow() {
       this.isMessageModalShow = false
       // window.location.href = '/manager-home'
+    },
+    deleteTags() {
+      let tagsList = this.deleteTagsList
+      if (tagsList.length > 0) {
+        console.log(this.deleteTagsList)
+        let body = {
+          tagsList: tagsList
+        }
+
+        fetch("http://localhost:8080/delete_tags", {
+          method: "DELETE",
+          headers: {
+            "Content-type": "application/json"
+          },
+          body: JSON.stringify(body)
+        })
+          .then(res => res.json())
+          .then(data => {
+            console.log(data)
+          })
+
+        window.location.reload()
+
+      }
+    },
+    createTags() {
+      if(this.createTagsInput) {
+        let body = {
+          tagsName : this.createTagsInput
+        }
+        fetch("http://localhost:8080/create_tags", {
+          method: "POST",
+          headers: {
+            "Content-type" : "application/json"
+          },
+          body: JSON.stringify(body)
+        })
+          .then(res => res.json())
+          .then(data => {
+            console.log(data)
+            window.location.reload()
+          })
+      }
     }
 
   }
@@ -237,36 +284,24 @@ export default {
     </div>
 
     <Modal v-if="isModalShow" @pushOutside="switchModal">
+      <p class="tips">標籤分類 ( 文章數 )</p>
       <div class="all-tags">
-        <div class="old-tags">
-          <div class="one-tag">
-            <input type="checkbox" name="" id="dvd">
-            <label for="dvd">DVD</label>
+        <div class="old-tags" v-for="tag in this.tagsData">
+          <div class="one-tag" v-if="tag.amount > 0">
+            <input type="checkbox" name="" :id="tag.tags" :value="tag.tags" v-model="deleteTagsList" disabled>
+            <label :for="tag.tags">{{ tag.tags }} ( {{ tag.amount }} )</label>
+          </div>
+          <div class="one-tag" v-else>
+            <input type="checkbox" name="" :id="tag.tags" :value="tag.tags" v-model="deleteTagsList">
+            <label :for="tag.tags">{{ tag.tags }} ( {{ tag.amount }} )</label>
           </div>
         </div>
 
-        <div class="old-tags">
-          <div class="one-tag">
-            <input type="checkbox" name="" id="dvd">
-            <label for="dvd">DVD</label>
-          </div>
+        <div class="delete">
+          <div class="btn deleteBtn" @click="deleteTags">刪除</div>
+          <p class="tips">文章數目不為0的標籤才能刪哦!</p>
         </div>
 
-        <div class="old-tags">
-          <div class="one-tag">
-            <input type="checkbox" name="" id="dvd">
-            <label for="dvd">DVD</label>
-          </div>
-        </div>
-
-        <div class="old-tags">
-          <div class="one-tag">
-            <input type="checkbox" name="" id="dvd">
-            <label for="dvd">DVD</label>
-          </div>
-        </div>
-
-        <div class="btn deleteBtn" @click="updateAnswer">刪除</div>
       </div>
 
 
@@ -275,8 +310,8 @@ export default {
 
       <div class="create-tags">
         <label for="tag-input">新增標籤：</label>
-        <input type="text" name="" id="tag-input">
-        <div class="create-tags-btn">新增</div>
+        <input type="text" name="" id="tag-input" v-model="createTagsInput">
+        <div class="create-tags-btn" @click="createTags">新增</div>
       </div>
     </Modal>
 
@@ -310,6 +345,7 @@ export default {
   font-size: 0.5rem;
   display: flex;
   align-items: end;
+  margin: 0;
 }
 
 .create {
@@ -487,31 +523,59 @@ export default {
 }
 
 // Modal
-.old-tags {
-  padding: 0.5rem 0.7rem;
-  background-color: #75aaff;
-  border-radius: 0.5rem;
-  margin-top: 0.5rem;
+
+.all-tags {
   display: flex;
+  flex-direction: column;
   align-items: center;
-  justify-content: center;
 
-  label {
-    margin-left: 1rem;
-    color: #0023b1;
+  .old-tags {
+    padding: 0.5rem 0.7rem;
+    background-color: #75aaff;
+    border-radius: 0.5rem;
+    margin-top: 0.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    label {
+      margin-left: 1rem;
+      color: #0023b1;
+    }
+
+    input {
+      width: 1rem;
+      height: 1rem;
+    }
+
   }
 
-  input {
-    width: 1rem;
-    height: 1rem;
+  .delete {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+
+    .deleteBtn {
+      margin-top: 1rem;
+      color: #990000;
+      background-color: #ffa5a5;
+      // border: 2px solid #ff0000;
+
+      transition: 0.3s;
+
+      &:hover {
+        cursor: pointer;
+        scale: 1.05;
+      }
+
+      &:active {
+        scale: 0.95;
+      }
+
+
+    }
   }
 
-}
-
-.deleteBtn {
-  margin-top: 1rem;
-  color: #424242;
-  background-color: #c1c1c1;
 }
 
 
@@ -558,5 +622,4 @@ export default {
   align-items: center;
   justify-content: center;
 }
-
 </style>

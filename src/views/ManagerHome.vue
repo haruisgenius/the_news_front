@@ -89,7 +89,7 @@ export default {
         <select class="select-box" name="" id="" v-model="tagsText">
           <option value="">全部</option>
           <option class="tag" :value="tag.tags" @click="getTagsValue(tag.tags)" v-for="tag in this.tagsData"
-            :key="tag.tagsNumber">{{ tag.tags }}</option>
+            :key="tag.tagsNumber">{{ tag.tags }} ( {{ tag.amount }} )</option>
         </select>
         <!-- <input type="button" class="tag btn" v-for="tag in this.tagsData" :key="tag.tagsNumber">
       {{ tag.tags }} -->

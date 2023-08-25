@@ -153,7 +153,7 @@ export default {
 
     <div class="back-to-news d-flex">
       <div @click="goBack()" class="go-back"><i class="fa-solid fa-angle-left me-1"></i>返回</div>
-      <div class="tips ms-3">要按下面確定按鈕才會暫存輸入內容哦！</div>
+      <div class="tips ms-3">要按下方的確定按鈕才會暫存輸入內容哦！</div>
     </div>
 
     <div class="create">
