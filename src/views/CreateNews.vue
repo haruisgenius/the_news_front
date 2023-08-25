@@ -163,7 +163,7 @@ export default {
         .then(res => res.json())
         .then(data => {
           console.log(data)
-          this.isMessageModalShow = true
+          // this.isMessageModalShow = true
         })
       sessionStorage.removeItem('news')
       window.location.href = '/manager-home'
