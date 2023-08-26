@@ -47,6 +47,11 @@ export default {
       this.inputReadOnlyShow = false;  // 檢查輸入內容btn隱藏
       this.updateNewsBtnShow = true;   // 發布btn顯示
       this.modifyNewsBtnShow = true;   // 返回修改btn顯示
+      let ddd = new Date;
+      let day = ("0" + ddd.getDate()).slice(-2)
+      let month = ("0" + (ddd.getMonth() + 1)).slice(-2)
+      let today = ddd.getFullYear() + "-" + (month) + "-" + (day)
+      console.log(today)
 
       // 防呆: 檢查是否都有輸入內容，否則顯示錯誤訊息
       if (!this.title) {
@@ -54,7 +59,7 @@ export default {
         this.isUpdateAllow = true
         this.updateNewsBtnShow = false
       } else { this.titleError = '' }
-      if (!this.updateDate) {
+      if (this.updateDate < today) {
         this.dateError = '發布日期不可早於今天'
         this.isUpdateAllow = true
         this.updateNewsBtnShow = false
